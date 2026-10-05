@@ -13,7 +13,7 @@ st.markdown("Interactive dashboard for Atlantic Recording Corporation UK Market 
 # Caching the data load so the app doesn't slow down on every filter change
 @st.cache_data
 def load_data():
-    df, df_artists = load_and_standardize("Atlantic_United_Kingdom.csv")
+    df, df_artists = load_and_standardize()
     return df, df_artists
 
 df_main, df_artists = load_data()

@@ -1,8 +1,15 @@
 import pandas as pd
+import os
 
-def load_and_standardize(file_path):
+def load_and_standardize(file_path="Atlantic_United_Kingdom.csv"):
     print("Loading dataset...")
-    df = pd.read_csv(file_path)
+    
+    # Build absolute path to ensure Streamlit Cloud finds the file
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    full_path = os.path.join(base_dir, file_path)
+    
+    # Read the dataset
+    df = pd.read_csv(full_path)
     
     # 1. Date Validation
     df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y', errors='coerce')
@@ -22,21 +29,16 @@ def load_and_standardize(file_path):
     df['collaborator_count'] = df['artist_list'].apply(len)
     
     # Create an exploded dataframe where each row represents ONE artist per song
-    # This is critical for our Artist Dominance & Diversity KPIs
     df_exploded = df.explode('artist_list').rename(columns={'artist_list': 'individual_artist'})
     
     print("\n--- Standardization Complete ---")
     print(f"Original records: {len(df)}")
-    print(f"Exploded records (accounting for collaborations): {len(df_exploded)}")
+    print(f"Exploded records: {len(df_exploded)}")
     
     return df, df_exploded
 
 if __name__ == "__main__":
-    # Ensure 'Atlantic_United_Kingdom.csv' is in the same folder as this script
-    file_path = "Atlantic_United_Kingdom.csv"
-    
-    df_main, df_artists = load_and_standardize(file_path)
-    
-    # Preview the exploded data to verify collaborations split correctly
+    # Test the function locally
+    df_main, df_artists = load_and_standardize()
     print("\nPreview of Exploded Artist Data:")
     print(df_artists[['song', 'artist', 'individual_artist', 'collaborator_count']].head(10))
